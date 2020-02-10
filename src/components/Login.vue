@@ -73,7 +73,9 @@ export default {
         if (!res) return
         //使用解构赋值，将data取出来
         const { data: result } = await this.$http.post('login', this.loginForm)
-        if (result.meta.status !== 200) return this.$message.error('登录失败')
+        if (result.meta.status !== 200){
+          return this.$message.error('登录失败')
+        }
         this.$message.success('登录成功')
         //登录成功，保存token到sessionStorage中，
         //使用编程式导航router跳转到/home页面
