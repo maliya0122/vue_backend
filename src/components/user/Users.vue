@@ -45,7 +45,7 @@
         <el-table-column label="操作" width="300px">
           <template slot-scope="scope">
             <el-button type="primary" size="mini" @click="edituserdialog(scope.row)">编辑用户</el-button>
-            <el-button type="info" size="mini">修改角色</el-button>
+            <el-button type="info" size="mini" @click="allotuserdialog(scope.row)">修改角色</el-button>
             <el-button type="danger" size="mini" @click="deleteuser(scope.row.id)">删除用户</el-button>
           </template>
         </el-table-column>
@@ -114,7 +114,30 @@
           <el-button type="primary" @click="edituser">确 定</el-button>
         </span>
       </el-dialog>
-      
+
+      <!-- 修改角色的对话框 -->
+      <el-dialog title="修改角色" :visible.sync="allotdialogVisible" width="40%" @close="allotresetform">
+        <div class="text">当前用户：{{currentName}}</div>
+        <div class="text">当前角色：{{currentRole}}</div>
+        <div class="text">修改角色：
+          <template>
+            <el-select v-model="rolename" placeholder="请选择" @change="selectRole">
+              <el-option
+                v-for="item in RolesList"
+                :key="item.id"
+                :label="item.roleName"
+                :value="item.id">
+              </el-option>
+            </el-select>
+          </template>
+        </div>
+
+        <span slot="footer" class="dialog-footer">
+          <el-button @click="allotdialogVisible = false">取 消</el-button>
+          <el-button type="primary" @click="allotRole">确 定</el-button>
+        </span>
+      </el-dialog>
+
     </el-card>
   </div>
 </template>
@@ -208,7 +231,19 @@ export default {
           { required: true, message: '请输入邮箱', trigger: 'blur' },
           { validator: checkEmail, trigger: 'blur' }
         ]
-      }
+      },
+      //修改角色
+      allotdialogVisible:false,
+      //用户的id
+      UserId:"",
+      currentName:"",
+      currentRole:"",
+      //获取角色的数据
+      RolesList:[],
+      //修改的角色
+      rolename:"",
+      //角色id
+      RoleId:""
     }
   },
 
@@ -348,6 +383,51 @@ export default {
             message: '已取消删除'
           })
         })
+    },
+    //修改角色的对话框
+    allotuserdialog(data){
+      this.allotdialogVisible = true
+      this.UserId = data.id
+      this.currentName = data.username
+      this.currentRole = data.role_name
+      this.getRolesList()
+    },
+    //获取角色的数据
+    getRolesList() {
+      this.$http.get('roles').then(res => {
+        this.RolesList = res.data.data
+        //console.log(this.RolesList)
+      })
+    },
+    //重置修改角色的对话框
+    allotresetform(){
+      this.rolename = ""
+      this.RoleId = ""
+    },
+    //获取选择的角色id
+    selectRole(event){
+      //采用的是change事件，打印出来的event值就是绑定的id值
+      this.RoleId = event
+    },
+    //修改角色事件
+    allotRole(){
+      if(!this.RoleId){
+        return this.$message.error('请选择角色！')
+      }
+
+      this.$http.put(`users/${this.UserId}/role`,{ rid : this.RoleId }).then(res=>{
+            const result = res.data
+            if (result.meta.status !== 200) {
+              //添加失败
+              this.$message.error('修改角色失败！')
+              this.allotdialogVisible = false
+            } else {
+              //添加成功：弹框消失，有提示信息，页面自动刷新
+              this.$message.success('修改角色成功！')
+              this.allotdialogVisible = false
+              this.getUsersList()
+            }
+      })
     }
   }
 }
@@ -361,5 +441,9 @@ export default {
 }
 .el-pagination {
   margin-top: 20px;
+}
+.text{
+  font-size: 16px;
+  margin-top: 10px;
 }
 </style>
