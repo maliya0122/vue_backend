@@ -75,7 +75,17 @@
           </span>
       </el-dialog>
 
-      
+      <!-- 分页功能 -->
+      <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="queryinfo.pagenum"
+        :page-sizes="[1, 5, 10, 20]"
+        :page-size="queryinfo.pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total"
+      ></el-pagination>
+
 
     </el-card>
   </div>
@@ -228,6 +238,14 @@ export default {
             this.addcateForm.cat_pid = 0
             this.addcateForm.cat_level = 0
         }
+    },
+    handleSizeChange(newsize){
+        this.queryinfo.pagesize = newsize
+        this.getAllCates()
+    },
+    handleCurrentChange(newchange){
+        this.queryinfo.pagenum = newchange
+        this.getAllCates()
     }
   }
 }
