@@ -1,17 +1,20 @@
 import Vue from 'vue'
 import App from './App.vue'
 import router from './router'
-import './plugins/element.js'
+//import './plugins/element.js'
 // 导入全局样式
 import './assets/css/global.css'
 // 导入字体图标
 import './assets/fonts/iconfont.css'
 //导入vue-table-with-tree
 import ZkTable from 'vue-table-with-tree-grid'
+//导入富文本编辑器
+import VueQuillEditor from 'vue-quill-editor'
+
 
 // 导入 NProgress 包对应的JS和CSS
 import NProgress from 'nprogress'
-import 'nprogress/nprogress.css'
+
 
 //导入axios包
 import axios from 'axios'
@@ -29,6 +32,8 @@ axios.interceptors.response.use(config => {
   NProgress.done()
   return config
 })
+//注册富文本编辑器
+Vue.use(VueQuillEditor)
 
 Vue.prototype.$http = axios
 Vue.component(ZkTable.name, ZkTable)

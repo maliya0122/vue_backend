@@ -5,14 +5,13 @@
     <el-breadcrumb separator="/">
       <el-breadcrumb-item :to="{ path: '/welcome' }">首页</el-breadcrumb-item>
       <el-breadcrumb-item>
-        <a href="/categories">商品管理</a>
+        <a href="/goods">商品管理</a>
       </el-breadcrumb-item>
       <el-breadcrumb-item>商品列表</el-breadcrumb-item>
     </el-breadcrumb>
 
     <!-- 卡片 -->
     <el-card>
-
       <!-- 搜索区域，使用栅栏模式 -->
       <el-row :gutter="20">
         <el-col :span="10">
@@ -36,16 +35,14 @@
         <el-table-column prop="goods_price" label="商品价格(元)" width="130px"></el-table-column>
         <el-table-column prop="goods_weight" label="商品重量" width="100px"></el-table-column>
         <el-table-column label="创建时间" width="140px">
-          <template slot-scope="scope">
-            {{scope.row.add_time}}
-          </template>
+          <template slot-scope="scope">{{scope.row.add_time | showDate}}</template>
         </el-table-column>
 
         <!-- 操作栏 -->
         <el-table-column label="操作" width="200px">
-          <template>
+          <template slot-scope="scope">
             <el-button type="primary" size="mini">编辑</el-button>
-            <el-button type="danger" size="mini">删除</el-button>
+            <el-button type="danger" size="mini" @click="deletegoods(scope.row.goods_id)">删除</el-button>
           </template>
         </el-table-column>
       </el-table>
@@ -60,13 +57,13 @@
         layout="total, sizes, prev, pager, next, jumper"
         :total="total"
       ></el-pagination>
-
-
     </el-card>
   </div>
 </template>
 
 <script>
+import { formatDate } from '../../common/ultils'
+
 export default {
   data() {
     return {
@@ -98,7 +95,6 @@ export default {
         this.total = res.data.data.total
         console.log(this.GoodsList)
       })
-      
     },
     //获取每页展示几个
     handleSizeChange(newsize) {
@@ -116,6 +112,38 @@ export default {
     //添加商品按钮
     addProduct(){
       this.$router.push('/add')
+    },
+    //删除商品按钮
+    deletegoods(id){
+      this.$confirm('此操作将永久删除该商品, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      })
+        .then(() => {
+          return this.$http.delete('goods/' + id)
+        }).then(res=> {
+          const result = res.data
+          if(result.meta.status !== 200){
+            this.$message.error(result.meta.msg)
+          }else{
+            this.$message.success('删除商品成功！')
+            this.getGoodsList()
+          }
+        })
+        .catch(() => {
+          this.$message({
+            type: 'info',
+            message: '已取消删除'
+          })
+        })
+    }
+  },
+  filters:{
+    //格式化时间
+    showDate(value) {
+        let date = new Date(value*1000);
+        return formatDate(date, 'yyyy-MM-dd')
     }
   }
 }
@@ -124,8 +152,7 @@ export default {
 .el-card {
   margin-top: 20px;
 }
-.el-table{
+.el-table {
   margin-top: 20px;
 }
-
 </style>

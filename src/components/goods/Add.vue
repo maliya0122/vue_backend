@@ -68,7 +68,10 @@
               <el-button size="small" type="primary">点击上传</el-button>
             </el-upload>
           </el-tab-pane>
-          <el-tab-pane label="命名内容" name="4">命名内容</el-tab-pane>
+          <el-tab-pane label="命名内容" name="4">
+              <!-- <quill-editor v-model="addForm.goods_introduce"></quill-editor> -->
+              <el-button type="primary">添加商品</el-button>
+          </el-tab-pane>
         </el-tabs>
       </el-form>
     </el-card>
@@ -93,7 +96,8 @@ export default {
         pics: [],
         // 商品的详情描述
         goods_introduce: '',
-        attrs: []
+        attrs: [],
+        goods_introduce:''
       },
       addFormRules: {
         goods_name: [
@@ -170,4 +174,5 @@ export default {
 .el-tabs {
   margin-top: 20px;
 }
+
 </style>
